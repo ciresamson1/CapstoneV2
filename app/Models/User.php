@@ -38,4 +38,13 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class);
     }
+
+        /**
+     * Projects managed by this user
+     */
+    public function managedProjects()
+    {
+        return $this->hasMany(Project::class, 'manager_id');
+    }
+
 }
