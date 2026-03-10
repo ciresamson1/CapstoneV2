@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class ProjectController extends Controller
 {
     /**
-     * Display projects list
+     * Display project list
      */
     public function index()
     {
@@ -21,18 +21,17 @@ class ProjectController extends Controller
     }
 
     /**
-     * Show create project form
+     * Show create form
      */
     public function create()
     {
-        // get users to assign as manager
         $users = User::all();
 
         return view('projects.create', compact('users'));
     }
 
     /**
-     * Store new project
+     * Store project
      */
     public function store(Request $request)
     {
@@ -56,5 +55,51 @@ class ProjectController extends Controller
 
         return redirect()->route('projects.index')
             ->with('success', 'Project created successfully');
+    }
+
+    /**
+     * Show edit form
+     */
+    public function edit(Project $project)
+    {
+        $users = User::all();
+
+        return view('projects.edit', compact('project', 'users'));
+    }
+
+    /**
+     * Update project
+     */
+    public function update(Request $request, Project $project)
+    {
+        $request->validate([
+            'name' => 'required|max:255',
+            'description' => 'nullable',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'manager_id' => 'required'
+        ]);
+
+        $project->update([
+            'name' => $request->name,
+            'description' => $request->description,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'manager_id' => $request->manager_id
+        ]);
+
+        return redirect()->route('projects.index')
+            ->with('success', 'Project updated successfully');
+    }
+
+    /**
+     * Delete project
+     */
+    public function destroy(Project $project)
+    {
+        $project->delete();
+
+        return redirect()->route('projects.index')
+            ->with('success', 'Project deleted successfully');
     }
 }
