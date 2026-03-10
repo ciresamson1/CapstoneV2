@@ -22,7 +22,7 @@ class TaskController extends Controller
     }
 
     /**
-     * Show create task form
+     * Show create form
      */
     public function create()
     {
@@ -57,5 +57,47 @@ class TaskController extends Controller
 
         return redirect()->route('tasks.index')
             ->with('success','Task created successfully');
+    }
+
+    /**
+     * Show edit page
+     */
+    public function edit(Task $task)
+    {
+        $projects = Project::all();
+        $users = User::all();
+
+        return view('tasks.edit', compact('task','projects','users'));
+    }
+
+    /**
+     * Update task
+     */
+    public function update(Request $request, Task $task)
+    {
+        $request->validate([
+            'title' => 'required|max:255',
+            'project_id' => 'required',
+            'assigned_to' => 'required',
+            'start_date' => 'required',
+            'due_date' => 'required',
+            'status' => 'required'
+        ]);
+
+        $task->update($request->all());
+
+        return redirect()->route('tasks.index')
+            ->with('success','Task updated successfully');
+    }
+
+    /**
+     * Delete task
+     */
+    public function destroy(Task $task)
+    {
+        $task->delete();
+
+        return redirect()->route('tasks.index')
+            ->with('success','Task deleted successfully');
     }
 }
