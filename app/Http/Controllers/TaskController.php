@@ -100,4 +100,28 @@ class TaskController extends Controller
         return redirect()->route('tasks.index')
             ->with('success','Task deleted successfully');
     }
+
+        /**
+     * Display Gantt chart
+     */
+   public function gantt()
+{
+    $tasks = Task::all();
+
+    $ganttTasks = $tasks->map(function ($task) {
+        return [
+            'id' => (string) $task->id,
+            'name' => $task->title,
+            'start' => \Carbon\Carbon::parse($task->start_date)->format('Y-m-d'),
+            'end' => \Carbon\Carbon::parse($task->due_date)->format('Y-m-d'),
+            'progress' => $task->status === 'completed' ? 100 : 0
+        ];
+    });
+
+    return view('tasks.gantt', [
+        'tasks' => $ganttTasks->values()
+    ]);
+}
+
+
 }

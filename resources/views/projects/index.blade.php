@@ -26,6 +26,7 @@ Create Project
 <th>Status</th>
 <th>Start Date</th>
 <th>Deadline</th>
+<th>Progress</th>
 <th>Actions</th>
 </tr>
 </thead>
@@ -45,10 +46,24 @@ Create Project
 
 <td>
 
+<div class="w-full bg-gray-200 rounded-full h-4">
+
+<div class="bg-green-500 h-4 rounded-full"
+style="width: {{ $project->progress() }}%">
+</div>
+
+</div>
+
+<div class="text-sm mt-1">
+{{ $project->progress() }} %
+</div>
+
+</td>
+
+<td>
+
 <a href="{{ route('projects.edit',$project->id) }}"
-class="text-blue-500">
-Edit
-</a>
+class="text-blue-500">Edit</a>
 
 <form action="{{ route('projects.destroy',$project->id) }}"
 method="POST"
@@ -57,9 +72,7 @@ style="display:inline">
 @csrf
 @method('DELETE')
 
-<button class="text-red-500 ml-2">
-Delete
-</button>
+<button class="text-red-500 ml-2">Delete</button>
 
 </form>
 

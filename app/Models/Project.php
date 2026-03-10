@@ -43,4 +43,23 @@ class Project extends Model
         return $this->hasMany(Task::class);
     }
 
+        /**
+     * Calculate project progress percentage
+     */
+    public function progress()
+    {
+        $totalTasks = $this->tasks()->count();
+
+        if ($totalTasks === 0) {
+            return 0;
+        }
+
+        $completedTasks = $this->tasks()
+            ->where('status', 'completed')
+            ->count();
+
+        return round(($completedTasks / $totalTasks) * 100);
+    }
+
+
 }
