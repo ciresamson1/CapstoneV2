@@ -8,6 +8,7 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Models\Project;
 use App\Models\Task;
+use App\Models\User;  
 
 Route::get('/dashboard', function () {
 
@@ -21,11 +22,39 @@ Route::get('/dashboard', function () {
         ->where('status','!=','completed')
         ->count();
 
+    $totalUsers = User::count();
+
+    $dueSoonTasks = Task::whereBetween('due_date',[now(),now()->addDays(3)])
+        ->where('status','!=','completed')
+        ->take(5)
+        ->get();
+
     $recentProjects = Project::with('tasks')->latest()->take(5)->get();
 
     $recentTasks = Task::with('project')->latest()->take(5)->get();
 
-    $recentTasks = Task::with('project')->latest()->take(5)->get();
+    // TEAM WORKLOAD
+    $users = User::withCount('tasks')->get();
+
+    $userNames = $users->pluck('name');
+    $userTaskCounts = $users->pluck('tasks_count');
+
+    // ACTIVITY LOG
+    $activities = Task::with(['assignee.role'])
+        ->latest()
+        ->take(12)
+        ->get()
+        ->map(function($task){
+
+        $user = $task->assignee->name ?? 'Unknown';
+        $role = $task->assignee->role->name ?? '';
+
+        return [
+        'message' => $user . ' (' . $role . ') updated task "' . $task->title . '"',
+        'time' => $task->updated_at
+        ];
+
+    });
 
     return view('dashboard', compact(
         'totalProjects',
@@ -33,8 +62,13 @@ Route::get('/dashboard', function () {
         'completedTasks',
         'pendingTasks',
         'overdueTasks',
+        'totalUsers',
+        'dueSoonTasks',
         'recentProjects',
-        'recentTasks'
+        'recentTasks',
+        'activities',
+        'userNames',
+        'userTaskCounts'
     ));
 
 })->middleware(['auth','verified'])->name('dashboard');
