@@ -6,14 +6,38 @@ use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
-
-Route::get('/', function () {
-    return view('welcome');
-});
+use App\Models\Project;
+use App\Models\Task;
 
 Route::get('/dashboard', function () {
-    return view('dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+
+    $totalProjects = Project::count();
+    $totalTasks = Task::count();
+
+    $completedTasks = Task::where('status','completed')->count();
+    $pendingTasks = Task::where('status','pending')->count();
+
+    $overdueTasks = Task::where('due_date','<',now())
+        ->where('status','!=','completed')
+        ->count();
+
+    $recentProjects = Project::with('tasks')->latest()->take(5)->get();
+
+    $recentTasks = Task::with('project')->latest()->take(5)->get();
+
+    $recentTasks = Task::with('project')->latest()->take(5)->get();
+
+    return view('dashboard', compact(
+        'totalProjects',
+        'totalTasks',
+        'completedTasks',
+        'pendingTasks',
+        'overdueTasks',
+        'recentProjects',
+        'recentTasks'
+    ));
+
+})->middleware(['auth','verified'])->name('dashboard');
 
 /*
 |--------------------------------------------------------------------------

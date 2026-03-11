@@ -14,23 +14,69 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased">
-        <div class="min-h-screen bg-gray-100">
-            @include('layouts.navigation')
+    <body class="font-sans antialiased bg-gray-100">
 
-            <!-- Page Heading -->
-            @isset($header)
-                <header class="bg-white shadow">
-                    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-                        {{ $header }}
-                    </div>
-                </header>
-            @endisset
+<div class="flex min-h-screen">
 
-            <!-- Page Content -->
-            <main>
-                {{ $slot }}
-            </main>
-        </div>
-    </body>
+<!-- Sidebar -->
+<div class="w-64 bg-gray-900 text-white">
+
+<div class="p-6 text-xl font-bold border-b border-gray-700">
+Project Manager
+</div>
+
+<nav class="mt-6">
+
+<a href="{{ route('dashboard') }}" class="block py-3 px-6 hover:bg-gray-700">
+Dashboard
+</a>
+
+<a href="{{ route('projects.index') }}" class="block py-3 px-6 hover:bg-gray-700">
+Projects
+</a>
+
+<a href="{{ route('tasks.index') }}" class="block py-3 px-6 hover:bg-gray-700">
+Tasks
+</a>
+
+<a href="{{ route('tasks.gantt') }}" class="block py-3 px-6 hover:bg-gray-700">
+Gantt Chart
+</a>
+
+<a href="{{ route('users.index') }}" class="block py-3 px-6 hover:bg-gray-700">
+Users
+</a>
+
+<a href="{{ route('roles.index') }}" class="block py-3 px-6 hover:bg-gray-700">
+Roles
+</a>
+
+</nav>
+
+</div>
+
+<!-- Main Content -->
+<div class="flex-1">
+
+@include('layouts.navigation')
+
+<!-- Page Heading -->
+@if (isset($header))
+<header class="bg-white shadow">
+<div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+{{ $header }}
+</div>
+</header>
+@endif
+
+<!-- Page Content -->
+<main>
+{{ $slot }}
+</main>
+
+</div>
+
+</div>
+
+</body>
 </html>
