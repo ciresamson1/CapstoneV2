@@ -76,10 +76,27 @@ $pxPerDay = 25;
 
 // TODAY POSITION
 $today = \Carbon\Carbon::now();
-$todayOffset = $timelineStart ? $today->diffInDays($timelineStart) : 0;
-$todayOffset = min($todayOffset, $totalDays);
+
+$todayOffset = 0;
+
+if ($timelineStart && $timelineEnd) {
+
+    // signed difference (correct)
+    $todayOffset = \Carbon\Carbon::parse($timelineStart)->diffInDays($today, false);
+
+    // clamp
+    if ($todayOffset < 0) {
+        $todayOffset = 0;
+    }
+
+    if ($todayOffset > $totalDays) {
+        $todayOffset = $totalDays;
+    }
+}
+
 $todayLeft = $todayOffset * $pxPerDay;
 @endphp
+
 
 <!-- DATE HEADER -->
 <div class="flex mb-4 ml-40">
@@ -135,9 +152,15 @@ $bg = match($task['color']) {
 
         <!-- TODAY LINE -->
         <div class="absolute top-0 bottom-0 z-20"
-             style="left: {{ $todayLeft }}px">
-            <div class="w-0.5 h-full bg-red-500"></div>
-        </div>
+     style="left: {{ $todayLeft }}px">
+
+    <div class="w-1 h-full bg-red-500"></div>
+
+    <div class="absolute -top-6 -left-4 text-xs text-red-500 font-bold">
+        Today
+    </div>
+
+</div>
 
         <!-- TASK BAR -->
         <div class="absolute h-6 rounded {{ $bg }}"
