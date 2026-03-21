@@ -23,37 +23,39 @@ and <span class="font-semibold text-blue-600">{{ $totalProjects }}</span> active
 
 
 
-<!-- KPI CARDS -->
-<div class="grid grid-cols-1 md:grid-cols-6 gap-6">
+<!-- SMART KPI CARDS -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
 
-<div class="bg-white p-6 rounded shadow text-center">
-<h3 class="text-gray-500">Projects</h3>
-<p class="text-3xl font-bold">{{ $totalProjects }}</p>
+<!-- Active Projects -->
+<div class="bg-white p-6 rounded shadow">
+    <h3 class="text-gray-500 text-sm">Active Projects</h3>
+    <p class="text-3xl font-bold text-blue-600">
+        {{ $activeProjects }}
+    </p>
 </div>
 
-<div class="bg-white p-6 rounded shadow text-center">
-<h3 class="text-gray-500">Tasks</h3>
-<p class="text-3xl font-bold">{{ $totalTasks }}</p>
+<!-- My Tasks -->
+<div class="bg-white p-6 rounded shadow">
+    <h3 class="text-gray-500 text-sm">My Tasks</h3>
+    <p class="text-3xl font-bold text-indigo-600">
+        {{ $myTasks }}
+    </p>
 </div>
 
-<div class="bg-green-100 p-6 rounded shadow text-center">
-<h3 class="text-green-700">Completed</h3>
-<p class="text-3xl font-bold">{{ $completedTasks }}</p>
+<!-- Due Soon -->
+<div class="bg-white p-6 rounded shadow">
+    <h3 class="text-gray-500 text-sm">Due Soon (5 days)</h3>
+    <p class="text-3xl font-bold text-yellow-500">
+        {{ $dueSoonCount }}
+    </p>
 </div>
 
-<div class="bg-yellow-100 p-6 rounded shadow text-center">
-<h3 class="text-yellow-700">Pending</h3>
-<p class="text-3xl font-bold">{{ $pendingTasks }}</p>
-</div>
-
-<div class="bg-red-100 p-6 rounded shadow text-center">
-<h3 class="text-red-700">Overdue</h3>
-<p class="text-3xl font-bold">{{ $overdueTasks }}</p>
-</div>
-
-<div class="bg-blue-100 p-6 rounded shadow text-center">
-<h3 class="text-blue-700">Users</h3>
-<p class="text-3xl font-bold">{{ $totalUsers }}</p>
+<!-- Overdue -->
+<div class="bg-white p-6 rounded shadow">
+    <h3 class="text-gray-500 text-sm">Overdue Tasks</h3>
+    <p class="text-3xl font-bold text-red-600">
+        {{ $overdueTasks }}
+    </p>
 </div>
 
 </div>

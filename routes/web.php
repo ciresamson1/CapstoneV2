@@ -33,6 +33,28 @@ Route::get('/dashboard', function () {
 
     $recentTasks = Task::with('project')->latest()->take(5)->get();
 
+    // ACTIVE PROJECTS
+$activeProjects = Project::count();
+
+// ROLE-BASED TASKS
+$user = auth()->user();
+
+if ($user->role && $user->role->name === 'Project Manager') {
+    $myTasks = Task::count();
+} else {
+    $myTasks = Task::where('assigned_to', $user->id)->count();
+}
+
+// DUE SOON (next 5 days)
+$dueSoonCount = Task::whereBetween('due_date', [now(), now()->addDays(5)])
+    ->where('status', '!=', 'completed')
+    ->count();
+
+// OVERDUE
+$overdueTasks = Task::where('due_date', '<', now())
+    ->where('status', '!=', 'completed')
+    ->count();
+
     // TEAM WORKLOAD
     $users = User::withCount('tasks')->get();
 
@@ -68,7 +90,11 @@ Route::get('/dashboard', function () {
         'recentTasks',
         'activities',
         'userNames',
-        'userTaskCounts'
+        'userTaskCounts',
+        'activeProjects',
+        'myTasks',
+        'dueSoonCount',
+        'overdueTasks'
     ));
 
 })->middleware(['auth','verified'])->name('dashboard');
