@@ -61,37 +61,124 @@ and <span class="font-semibold text-blue-600">{{ $totalProjects }}</span> active
 </div>
 
 
-<!-- CHARTS -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- GANTT CHART -->
+<div class="bg-white p-6 rounded shadow">
 
-    <!-- LEFT SIDE -->
-    <div class="bg-white p-6 rounded shadow">
-        <h3 class="text-lg font-semibold mb-4">Task Status</h3>
-        <canvas id="taskChart"></canvas>
+<h3 class="text-lg font-semibold mb-4">
+📊 Project Timeline ({{ $latestProject->name ?? 'No Project' }})
+</h3>
+
+@if($latestProject && count($ganttTasks))
+
+@php
+$totalDays = max(\Carbon\Carbon::parse($timelineStart)->diffInDays($timelineEnd),1);
+$pxPerDay = 25;
+
+// TODAY POSITION
+$today = \Carbon\Carbon::now();
+$todayOffset = $timelineStart ? $today->diffInDays($timelineStart) : 0;
+$todayOffset = min($todayOffset, $totalDays);
+$todayLeft = $todayOffset * $pxPerDay;
+@endphp
+
+<!-- DATE HEADER -->
+<div class="flex mb-4 ml-40">
+@for($i = 0; $i <= $totalDays; $i+=3)
+    @php
+        $date = \Carbon\Carbon::parse($timelineStart)->addDays($i);
+    @endphp
+    <div class="text-xs text-gray-500" style="width: {{ $pxPerDay * 3 }}px">
+        {{ $date->format('M d') }}
+    </div>
+@endfor
+</div>
+
+<!-- TASK ROWS -->
+<div class="space-y-4">
+
+@foreach($ganttTasks as $task)
+
+@php
+$start = \Carbon\Carbon::parse($task['start']);
+$end = \Carbon\Carbon::parse($task['end']);
+
+$offsetDays = $start->diffInDays($timelineStart);
+$durationDays = max($start->diffInDays($end),1);
+
+$left = $offsetDays * $pxPerDay;
+$width = $durationDays * $pxPerDay;
+
+// COLOR
+$bg = match($task['color']) {
+    'green' => 'bg-green-500',
+    'yellow' => 'bg-yellow-400',
+    'red' => 'bg-red-500',
+    default => 'bg-blue-500'
+};
+@endphp
+
+<div class="flex items-center">
+
+    <!-- TASK NAME -->
+    <div class="w-40 text-sm">
+        {{ $task['name'] }}
     </div>
 
-    <!-- RIGHT SIDE -->
-    <div class="space-y-6">
+    <!-- TIMELINE -->
+    <div class="relative flex-1 h-6 bg-gray-100 rounded overflow-hidden">
 
-        <!-- Activity Log -->
-        @foreach($activities as $activity)
+        <!-- GRID LINES -->
+        @for($i = 0; $i <= $totalDays; $i+=3)
+            <div class="absolute top-0 bottom-0 border-l border-gray-200"
+                 style="left: {{ $i * $pxPerDay }}px"></div>
+        @endfor
 
-            <div class="flex justify-between border-b py-2 text-sm">
-
-            <span class="text-gray-700">
-            {{ $activity['message'] }}
-            </span>
-
-            <span class="text-gray-400">
-            {{ \Carbon\Carbon::parse($activity['time'])->diffForHumans() }}
-            </span>
-
-            </div>
-
-        @endforeach
-
+        <!-- TODAY LINE -->
+        <div class="absolute top-0 bottom-0 z-20"
+             style="left: {{ $todayLeft }}px">
+            <div class="w-0.5 h-full bg-red-500"></div>
         </div>
-        <!-- Recent Projects -->
+
+        <!-- TASK BAR -->
+        <div class="absolute h-6 rounded {{ $bg }}"
+             style="left: {{ $left }}px; width: {{ $width }}px">
+        </div>
+
+    </div>
+
+</div>
+
+@endforeach
+
+</div>
+
+<!-- LEGEND -->
+<div class="mt-6 flex gap-6 text-sm">
+    <span class="flex items-center gap-2">
+        <span class="w-3 h-3 bg-green-500 rounded-full"></span> On Track
+    </span>
+
+    <span class="flex items-center gap-2">
+        <span class="w-3 h-3 bg-yellow-400 rounded-full"></span> Near Deadline
+    </span>
+
+    <span class="flex items-center gap-2">
+        <span class="w-3 h-3 bg-red-500 rounded-full"></span> Overdue
+    </span>
+</div>
+
+@else
+<p class="text-gray-500">No tasks available</p>
+@endif
+
+</div>
+
+
+
+
+
+
+<!-- Recent Projects -->
         <div class="bg-white p-6 rounded shadow">
 
             <h3 class="text-lg font-semibold mb-4">Recent Projects</h3>

@@ -8,7 +8,10 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\TaskController;
 use App\Models\Project;
 use App\Models\Task;
-use App\Models\User;  
+use App\Models\User;
+use Carbon\Carbon;
+
+
 
 Route::get('/dashboard', function () {
 
@@ -18,9 +21,7 @@ Route::get('/dashboard', function () {
     $completedTasks = Task::where('status','completed')->count();
     $pendingTasks = Task::where('status','pending')->count();
 
-    $overdueTasks = Task::where('due_date','<',now())
-        ->where('status','!=','completed')
-        ->count();
+   
 
     $totalUsers = User::count();
 
@@ -54,6 +55,57 @@ $dueSoonCount = Task::whereBetween('due_date', [now(), now()->addDays(5)])
 $overdueTasks = Task::where('due_date', '<', now())
     ->where('status', '!=', 'completed')
     ->count();
+
+
+// GET LATEST PROJECT WITH TASKS
+$latestProject = Project::with('tasks')->latest()->first();
+
+
+$ganttTasks = [];
+
+if ($latestProject) {
+
+$timelineStart = null;
+$timelineEnd = null;
+
+if ($latestProject && $latestProject->tasks->count()) {
+
+    $timelineStart = $latestProject->tasks->min('created_at');
+    $timelineEnd = $latestProject->tasks->max('due_date');
+
+    $timelineStart = Carbon::parse($timelineStart)->startOfDay();
+    $timelineEnd = Carbon::parse($timelineEnd)->endOfDay();
+}
+
+    foreach ($latestProject->tasks as $task) {
+
+        $start = \Carbon\Carbon::parse($task->created_at);
+        $end = \Carbon\Carbon::parse($task->due_date);
+
+        $today = now();
+
+        // STATUS COLOR
+        if ($task->status === 'completed') {
+            $color = 'green';
+        } elseif ($end->isPast()) {
+            $color = 'red';
+        } elseif ($end->diffInDays($today) <= 3) {
+            $color = 'yellow';
+        } else {
+            $color = 'blue';
+        }
+
+        $ganttTasks[] = [
+            'name' => $task->title,
+            'start' => $start->format('Y-m-d'),
+            'end' => $end->format('Y-m-d'),
+            'color' => $color,
+        ];
+    }
+}
+
+
+
 
     // TEAM WORKLOAD
     $users = User::withCount('tasks')->get();
@@ -94,7 +146,11 @@ $overdueTasks = Task::where('due_date', '<', now())
         'activeProjects',
         'myTasks',
         'dueSoonCount',
-        'overdueTasks'
+        'overdueTasks',
+        'latestProject',
+        'ganttTasks',
+        'timelineStart',
+        'timelineEnd'
     ));
 
 })->middleware(['auth','verified'])->name('dashboard');
