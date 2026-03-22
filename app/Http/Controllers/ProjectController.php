@@ -2,22 +2,40 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\Project;
 use App\Models\User;
-use Illuminate\Http\Request;
 
 class ProjectController extends Controller
 {
     /**
-     * Display project list
+     * Display project list with search + filters
      */
-    public function index()
+    public function index(Request $request)
     {
-        $projects = Project::with('manager')
-            ->latest()
-            ->paginate(10);
+        $query = Project::with('manager');
 
-        return view('projects.index', compact('projects'));
+        // SEARCH
+        if ($request->search) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // FILTER BY MANAGER
+        if ($request->manager) {
+            $query->where('manager_id', $request->manager);
+        }
+
+        // FILTER BY STATUS
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
+
+        $projects = $query->latest()->paginate(10);
+
+        // dropdown data
+        $managers = User::all();
+
+        return view('projects.index', compact('projects', 'managers'));
     }
 
     /**

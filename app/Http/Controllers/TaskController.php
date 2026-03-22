@@ -125,3 +125,26 @@ class TaskController extends Controller
 
 
 }
+
+   /**
+ * Display Gantt chart per project
+ */
+public function gantt(Project $project)
+{
+    $tasks = $project->tasks;
+
+    $ganttTasks = $tasks->map(function ($task) {
+        return [
+            'id' => (string) $task->id,
+            'name' => $task->title,
+            'start' => \Carbon\Carbon::parse($task->start_date)->format('Y-m-d'),
+            'end' => \Carbon\Carbon::parse($task->due_date)->format('Y-m-d'),
+            'progress' => $task->status === 'completed' ? 100 : 0
+        ];
+    });
+
+    return view('tasks.gantt', [
+        'project' => $project,
+        'tasks' => $ganttTasks
+    ]);
+}

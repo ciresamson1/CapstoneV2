@@ -39,7 +39,7 @@ Projects
 Tasks
 </a>
 
-<a href="{{ route('tasks.gantt') }}" class="block py-3 px-6 hover:bg-gray-700">
+<a href="{{ route('tasks.gantt', 1) }}" class="block py-3 px-6 hover:bg-gray-700">
 Gantt Chart
 </a>
 
