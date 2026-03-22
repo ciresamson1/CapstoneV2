@@ -191,6 +191,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('tasks', TaskController::class);
     Route::get('/gantt/{project}', [TaskController::class, 'gantt'])
     ->name('tasks.gantt');
+    Route::get('/projects/{project}', [ProjectController::class, 'show'])
+    ->name('projects.show');
 
 });
 

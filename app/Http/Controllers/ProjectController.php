@@ -120,4 +120,44 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')
             ->with('success', 'Project deleted successfully');
     }
+
+
+    public function show(Project $project)
+{
+    $tasks = $project->tasks()->with('assignee')->get();
+
+    // Timeline
+    $timelineStart = $tasks->min('start_date');
+    $timelineEnd = $tasks->max('due_date');
+
+    $timelineStart = $timelineStart ? \Carbon\Carbon::parse($timelineStart)->startOfDay() : now();
+    $timelineEnd = $timelineEnd ? \Carbon\Carbon::parse($timelineEnd)->endOfDay() : now()->addDays(7);
+
+    // Prepare Gantt data
+    $ganttTasks = $tasks->map(function ($task) {
+
+        $start = \Carbon\Carbon::parse($task->start_date);
+        $end = \Carbon\Carbon::parse($task->due_date);
+
+        return [
+            'name' => $task->title,
+            'start' => $start->format('Y-m-d'),
+            'end' => $end->format('Y-m-d'),
+            'progress' => $task->status === 'completed' ? 100 : 50,
+            'assigned' => $task->assignee->name ?? 'N/A',
+            'status' => $task->status,
+            'due' => $task->due_date
+        ];
+    });
+
+    return view('projects.show', compact(
+        'project',
+        'tasks',
+        'ganttTasks',
+        'timelineStart',
+        'timelineEnd'
+    ));
+}
+
+
 }

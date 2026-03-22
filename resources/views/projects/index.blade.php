@@ -118,7 +118,7 @@ Projects Management
                 <!-- ACTIONS -->
                 <div class="flex gap-3 text-sm">
 
-                    <a href="{{ route('tasks.gantt', $project->id) }}"
+                    <a href="{{ route('projects.show', $project->id) }}"
                        class="text-green-600 hover:underline">
                         View
                     </a>
