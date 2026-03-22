@@ -197,7 +197,125 @@ $bg = match($task['color']) {
 </div>
 
 
+<!-- MY TASKS + ACTIVITY -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
+    <!-- MY TASKS -->
+    <div class="bg-white p-6 rounded shadow">
+
+        <h3 class="text-lg font-semibold mb-4">
+            📋 My Tasks
+        </h3>
+
+        <table class="w-full text-sm">
+
+            <thead>
+                <tr class="border-b text-gray-500">
+                    <th class="text-left py-2">Task</th>
+                    <th class="text-left py-2">Status</th>
+                    <th class="text-left py-2">Due</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @forelse($myRecentTasks as $task)
+
+                <tr class="border-b">
+
+                    <td class="py-2">
+                        {{ $task->title }}
+                    </td>
+
+                    <td class="py-2">
+
+                        @if($task->status == 'completed')
+                            <span class="text-green-600 text-xs font-semibold">Completed</span>
+
+                        @elseif($task->status == 'pending')
+                            <span class="text-yellow-600 text-xs font-semibold">Pending</span>
+
+                        @else
+                            <span class="text-blue-600 text-xs font-semibold">
+                                {{ ucfirst($task->status) }}
+                            </span>
+                        @endif
+
+                    </td>
+
+                    <td class="py-2 text-gray-500 text-xs">
+                        {{ \Carbon\Carbon::parse($task->due_date)->format('M d') }}
+                    </td>
+
+                </tr>
+
+                @empty
+
+                <tr>
+                    <td colspan="3" class="py-4 text-center text-gray-400">
+                        No tasks assigned
+                    </td>
+                </tr>
+
+                @endforelse
+            </tbody>
+
+        </table>
+
+        <!-- VIEW ALL -->
+        <div class="mt-4">
+            <a href="{{ route('tasks.index') }}"
+               class="text-sm text-blue-600 hover:underline">
+               View All Tasks →
+            </a>
+        </div>
+
+    </div>
+
+
+    <!-- ACTIVITY -->
+    <div class="bg-white p-6 rounded shadow">
+
+        <h3 class="text-lg font-semibold mb-4">
+            🔔 Recent Activity
+        </h3>
+
+        <div class="space-y-4">
+
+            @forelse($activities as $activity)
+
+            <div class="border-b pb-2">
+
+                <p class="text-sm text-gray-700">
+                    {{ $activity['message'] }}
+                </p>
+
+                <p class="text-xs text-gray-400">
+                    {{ \Carbon\Carbon::parse($activity['time'])->diffForHumans() }}
+                </p>
+
+            </div>
+
+            @empty
+
+            <p class="text-gray-400 text-sm">
+                No recent activity
+            </p>
+
+            @endforelse
+
+        </div>
+
+        <!-- VIEW ALL -->
+        <div class="mt-4">
+            <a href="#"
+               class="text-sm text-blue-600 hover:underline">
+               View All Notifications →
+            </a>
+        </div>
+
+    </div>
+
+</div>
 
 
 

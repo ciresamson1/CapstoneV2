@@ -42,6 +42,15 @@ $user = auth()->user();
 
 if ($user->role && $user->role->name === 'Project Manager') {
     $myTasks = Task::count();
+
+    // MY TASKS (latest 5 assigned to logged user)
+$myRecentTasks = Task::where('assigned_to', auth()->id())
+    ->with('project')
+    ->latest()
+    ->take(5)
+    ->get();
+
+
 } else {
     $myTasks = Task::where('assigned_to', $user->id)->count();
 }
@@ -55,6 +64,12 @@ $dueSoonCount = Task::whereBetween('due_date', [now(), now()->addDays(5)])
 $overdueTasks = Task::where('due_date', '<', now())
     ->where('status', '!=', 'completed')
     ->count();
+
+$myRecentTasks = Task::where('assigned_to', auth()->id())
+    ->with('project')
+    ->latest()
+    ->take(5)
+    ->get();
 
 
 // GET LATEST PROJECT WITH TASKS
@@ -150,7 +165,8 @@ if ($latestProject && $latestProject->tasks->count()) {
         'latestProject',
         'ganttTasks',
         'timelineStart',
-        'timelineEnd'
+        'timelineEnd',
+        'myRecentTasks'
     ));
 
 })->middleware(['auth','verified'])->name('dashboard');
