@@ -14,8 +14,15 @@
 <!-- ========================= -->
 <div class="bg-white p-6 rounded-xl shadow">
 
-    <div class="flex justify-between items-center">
+    @php
+        $totalTasks = count($ganttTasks);
+        $completedTasks = collect($ganttTasks)->where('status', 'completed')->count();
+        $progress = $totalTasks > 0 ? round(($completedTasks / $totalTasks) * 100) : 0;
+    @endphp
 
+    <div class="flex justify-between items-center gap-6">
+
+        <!-- LEFT: PROJECT INFO -->
         <div>
             <h3 class="text-lg font-bold">{{ $project->name }}</h3>
 
@@ -25,6 +32,29 @@
             </p>
         </div>
 
+        <!-- CENTER: PROJECT PROGRESS (THIS IS YOUR RED BOX) -->
+        <div class="flex-1 max-w-md">
+
+            <div class="text-sm font-semibold text-gray-700 mb-1">
+                Project Progress
+            </div>
+
+            <!-- PROGRESS BAR -->
+            <div class="w-full bg-gray-200 rounded-full h-4">
+                <div class="bg-blue-600 h-4 rounded-full transition-all"
+                     style="width: {{ $progress }}%">
+                </div>
+            </div>
+
+            <!-- STATS -->
+            <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>{{ $completedTasks }} / {{ $totalTasks }} tasks</span>
+                <span>{{ $progress }}%</span>
+            </div>
+
+        </div>
+
+        <!-- RIGHT: ACTIONS -->
         <div class="flex gap-3">
             <a href="{{ route('projects.edit', $project->id) }}"
                class="bg-blue-600 text-white px-4 py-2 rounded">
